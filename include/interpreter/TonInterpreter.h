@@ -2,6 +2,7 @@
 
 #include "antlr4_generated/TonBaseVisitor.h"
 #include "core/Timeline.h"
+#include "core/Scope.h"
 #include <map>
 #include <string>
 #include <any>
@@ -9,11 +10,11 @@
 
 class TonInterpreter: public TonBaseVisitor {
     private:
-        std::map<std::string, std::string>& declaredTypes;
-        std::map<std::string, std::any>& memory;
-
+        std::shared_ptr<Scope<std::any>> currentScope;
     public:
-        TonInterpreter(std::map<std::string, std::string>& typesRef, std::map<std::string, std::any>& memoryRef): declaredTypes(typesRef), memory(memoryRef){}
+        TonInterpreter(){
+            currentScope = std::make_shared<Scope<std::any>>();
+        }
         
         std::any visitProgram(TonParser::ProgramContext *ctx) override;
         std::any visitBlock(TonParser::BlockContext *ctx) override;

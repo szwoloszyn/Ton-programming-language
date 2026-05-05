@@ -35,7 +35,7 @@ std::any TonInterpreter::visitVarDecl(TonParser::VarDeclContext *ctx) {
         else value = {};
     }
 
-    memory[varName] = value;
+    currentScope->define(varName, typeName, value);
     return value;
 }
 
@@ -45,22 +45,22 @@ std::any TonInterpreter::visitTargetExpr(TonParser::TargetExprContext *ctx) {
     auto targetNode = ctx->target(); 
     std::string baseName = targetNode->ID(0)->getText();
 
-    if (memory.find(baseName) == memory.end()) {
+    if (!currentScope->exists(baseName)) {
         throw std::runtime_error("Error: Undefined variable or timeline '" + baseName + "'.");
     }
 
     if (targetNode->ID().size() == 1) {
-        return memory[baseName];
+        return currentScope->get(baseName);
     }
 
     std::string trackName = targetNode->ID(1)->getText();
     
-    std::any baseObj = memory[baseName];
+    std::any baseObj = currentScope->get(baseName);
     if (baseObj.type() != typeid(Timeline)) {
         throw std::runtime_error("Error: '" + baseName + "' is not a TIMELINE, cannot access tracks.");
     }
 
-    Timeline timeline = std::any_cast<Timeline>(baseObj);
+    Timeline timeline = std::any_cast<Timeline&>(baseObj);
    
     if (timeline.tracks.find(trackName) == timeline.tracks.end()) {
         throw std::runtime_error("Error: Track '" + trackName + "' does not exist in timeline '" + baseName + "'.");
@@ -94,19 +94,19 @@ std::any TonInterpreter::visitAssignment(TonParser::AssignmentContext *ctx) {
 
     if (targetNode->ID().size() == 1) {
         std::string varName = targetNode->ID(0)->getText();
-        if (memory.find(varName) == memory.end()) {
+        if (!currentScope->exists(varName)) {
             throw std::runtime_error("Error: Variable '" + varName + "' must be declared first.");
         }
-        memory[varName] = visit(ctx->expr());
+        currentScope->set(varName, visit(ctx->expr()));
         return {};
     }
 
     std::string timelineName = targetNode->ID(0)->getText();
     std::string trackName = targetNode->ID(1)->getText();
 
-    if (memory.find(timelineName) == memory.end()) throw std::runtime_error("Timeline not found");
+    if (!currentScope->exists(timelineName)) throw std::runtime_error("Timeline not found");
     
-    std::any& baseObj = memory[timelineName];
+    std::any& baseObj = currentScope->get(timelineName);
     Timeline& timeline = std::any_cast<Timeline&>(baseObj);
 
     if (timeline.tracks.find(trackName) == timeline.tracks.end()) throw std::runtime_error("Track not found");
@@ -390,12 +390,12 @@ std::any TonInterpreter::visitTrackDecl(TonParser::TrackDeclContext *ctx) {
     std::string trackName = ctx->ID(1)->getText();    
 
 
-    if (memory.find(timelineName) == memory.end()) {
+    if (!currentScope->exists(timelineName)) {
         throw std::runtime_error("Error: Timeline '" + timelineName + "' not found.");
     }
 
 
-    std::any& baseObj = memory[timelineName];
+    std::any& baseObj = currentScope->get(timelineName);
     if (baseObj.type() != typeid(Timeline)) {
         throw std::runtime_error("Error: '" + timelineName + "' is not a TIMELINE.");
     }
@@ -420,10 +420,10 @@ std::any TonInterpreter::visitAudioOpStat(TonParser::AudioOpStatContext *ctx) {
     std::string timelineName = targetNode->ID(0)->getText();
 
 
-    if (memory.find(timelineName) == memory.end()) {
+    if (currentScope->exists(timelineName)) {
         throw std::runtime_error("Error: Timeline '" + timelineName + "' not found.");
     }
-    std::any& baseObj = memory[timelineName];
+    std::any& baseObj = currentScope->get(timelineName);
     if (baseObj.type() != typeid(Timeline)) throw std::runtime_error("Error: Target is not a TIMELINE.");
     Timeline& timeline = std::any_cast<Timeline&>(baseObj);
 
@@ -465,11 +465,11 @@ std::any TonInterpreter::visitAudioOpStat(TonParser::AudioOpStatContext *ctx) {
 std::any TonInterpreter::visitIsolateExpr(TonParser::IsolateExprContext *ctx) {
     auto targetNode = ctx -> target();
     std::string timelineName = targetNode->ID(0)->getText();
-    if (memory.find(timelineName) == memory.end()){
+    if (currentScope->exists(timelineName)){
         throw std::runtime_error("Error: Timeline '" + timelineName + "' not found.");
     }
 
-    std::any& baseObj = memory[timelineName];
+    std::any& baseObj = currentScope->get(timelineName);
     if (baseObj.type() != typeid(Timeline)){
         throw std::runtime_error("Error: Target is not a TIMELINE.");
     }

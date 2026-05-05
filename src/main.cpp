@@ -22,10 +22,6 @@ int main(int argc, const char* argv[]){
         return 1;
     }
 
-    std::map<std::string, std::string> declaredTypes;
-    std::map<std::string, std::any> memory;
-    std::map<std::string, int> declarationLines;
-
     TonSyntaxErrorListener myErrorListener;
 
     antlr4::ANTLRInputStream input(stream);
@@ -50,7 +46,7 @@ if (totalErrors > 0) {
     return 1;
 }
     TonDeclarationListener listener;
-    TonInterpreter interpreter(declaredTypes, memory);
+    TonInterpreter interpreter;
 
     try {
         antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener, treeAST);
