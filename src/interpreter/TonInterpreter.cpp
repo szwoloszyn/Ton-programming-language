@@ -36,6 +36,7 @@ std::any TonInterpreter::visitVarDecl(TonParser::VarDeclContext *ctx) {
         else if (typeName == "NUMERICAL") value = 0.0;
         else if (typeName == "NOTE") value = Note();
         else if (typeName == "STRING") value = std::string("");
+        else if (typeName == "CHAR") value = '\0'; 
         else value = {};
     }
 
@@ -164,6 +165,11 @@ std::any TonInterpreter::visitAssignment(TonParser::AssignmentContext *ctx) {
     timeline.tracks[trackName].events = newEventsBuffer; 
 
     return {};
+}
+
+std::any TonInterpreter::visitCharValExpr(TonParser::CharValExprContext *ctx){
+    std::string rawChar = ctx->CHAR_VAL()->getText();
+    return rawChar[1];
 }
 
 std::any TonInterpreter::visitArrayExpr(TonParser::ArrayExprContext *ctx) {
