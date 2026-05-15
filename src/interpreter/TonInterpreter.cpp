@@ -641,3 +641,120 @@ std::any TonInterpreter::visitAddSubMixExpr(TonParser::AddSubMixExprContext *ctx
     }
     return {};
 }
+
+std::any TonInterpreter::visitBreakStat(TonParser::BreakStatContext *ctx){
+    throw BreakException();
+}
+
+std::any TonInterpreter::visitContinueStat(TonParser::ContinueStatContext *ctx) {
+    throw ContinueException(); 
+}
+
+std::any TonInterpreter::visitUntilStat(TonParser::UntilStatContext *ctx) {
+    while (true){
+        std::any conditionAny = visit(ctx->expr());
+
+        if (conditionAny.type() != typeid(bool)) {
+            throw std::runtime_error("Error: UNTIL condition must be a BOOL.");
+        }
+
+        bool condition = std::any_cast<bool>(conditionAny);
+        if (condition){
+            break;
+        }
+        try {
+            visit(ctx->block()); 
+        } 
+        catch (BreakException&) {
+            break;
+        } 
+        catch (ContinueException&) {
+            continue;
+        }
+    }
+    return {};
+}
+
+std::any TonInterpreter::visitLoopStat(TonParser::LoopStatContext *ctx) {
+    
+
+    if (ctx->TIMES()) {
+        std::any timesAny = visit(ctx->expr(0));
+        int times = 0;
+        
+        if (timesAny.type() == typeid(int)) {
+            times = std::any_cast<int>(timesAny);
+        } else if (timesAny.type() == typeid(double)) {
+            times = static_cast<int>(std::any_cast<double>(timesAny));
+        } else {
+            throw std::runtime_error("Error: TIMES loop requires an integer count.");
+        }
+
+        for (int i=0; i<times; i++) {
+            try { visit(ctx->block()); } 
+            catch (BreakException&) { break; } 
+            catch (ContinueException&) { continue; }
+        }
+    }
+
+    else if (ctx->FROM()) {
+        std::string varName = ctx->ID()->getText();
+        std::string typeName = ctx->type()->getText();
+
+        int start = std::any_cast<int>(visit(ctx->expr(0)));
+        int end = std::any_cast<int>(visit(ctx->expr(1)));
+
+        int step = (start <= end) ? 1 : -1;
+
+
+        if (ctx->BY() != nullptr) {
+            step = std::any_cast<int>(visit(ctx->expr(2)));
+
+            if (step == 0) {
+                throw std::runtime_error("Error: Loop step cannot be zero.");
+            }
+        }
+
+        auto previousScope = currentScope;
+        currentScope = std::make_shared<Scope<std::any>>(previousScope);
+        currentScope->define(varName, typeName, start);
+
+        for (int i = start; (step > 0 ? i <= end : i >= end); i += step) {
+            currentScope->set(varName, i);
+            
+            try { visit(ctx->block()); } 
+            catch (BreakException&) { break; } 
+            catch (ContinueException&) { continue; }
+        }
+        currentScope = previousScope;
+    }
+
+    else if (ctx->ASSIGN()) {
+        std::string varName = ctx->ID()->getText();
+        std::string typeName = ctx->type()->getText();
+        
+        std::any arrayAny = visit(ctx->expr(0));
+        if (arrayAny.type() != typeid(std::vector<std::any>)) {
+            throw std::runtime_error("Error: Foreach loop requires an ARRAY on the right side of <-.");
+        }
+        auto arrayVec = std::any_cast<std::vector<std::any>>(arrayAny);
+
+        auto previousScope = currentScope;
+        currentScope = std::make_shared<Scope<std::any>>(previousScope);
+
+        currentScope->define(varName, typeName, std::any{});
+
+        for (auto& item : arrayVec) {
+            currentScope->set(varName, item);
+            
+            try { visit(ctx->block()); } 
+            catch (BreakException&) { break; } 
+            catch (ContinueException&) { continue; }
+        }
+
+        currentScope = previousScope;
+    }
+
+    return {};
+}
+
