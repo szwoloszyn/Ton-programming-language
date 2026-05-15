@@ -7,10 +7,13 @@
 #include <string>
 #include <any>
 #include <vector>
+#include <exception>
 
 class TonInterpreter: public TonBaseVisitor {
     private:
         std::shared_ptr<Scope<std::any>> currentScope;
+        struct BreakException : public std::exception {};
+        struct ContinueException : public std::exception {};
     public:
         TonInterpreter(){
             currentScope = std::make_shared<Scope<std::any>>();
@@ -53,4 +56,9 @@ class TonInterpreter: public TonBaseVisitor {
         std::any visitMulDivExpr(TonParser::MulDivExprContext *ctx) override;
         std::any visitAddSubMixExpr(TonParser::AddSubMixExprContext *ctx) override;
         std::any visitNumValExpr(TonParser::NumValExprContext *ctx) override;
+
+        std::any visitLoopStat(TonParser::LoopStatContext *ctx) override;
+        std::any visitUntilStat(TonParser::UntilStatContext *ctx) override;
+        std::any visitBreakStat(TonParser::BreakStatContext *ctx) override;
+        std::any visitContinueStat(TonParser::ContinueStatContext *ctx) override;
 };

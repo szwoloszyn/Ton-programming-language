@@ -50,7 +50,7 @@ ifStat
 
 loopStat 
     : EXCLAM_MARK LOOP L_ANGLE expr TIMES R_ANGLE block                                  
-    | EXCLAM_MARK LOOP L_ANGLE type ID FROM expr TO expr R_ANGLE block                   
+    | EXCLAM_MARK LOOP L_ANGLE type ID FROM expr TO expr (BY expr)? R_ANGLE block                 
     | EXCLAM_MARK LOOP L_ANGLE type ID ASSIGN expr R_ANGLE block                         
     ;
 

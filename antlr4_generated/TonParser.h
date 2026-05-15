@@ -320,6 +320,7 @@ public:
     antlr4::tree::TerminalNode *ID();
     antlr4::tree::TerminalNode *FROM();
     antlr4::tree::TerminalNode *TO();
+    antlr4::tree::TerminalNode *BY();
     antlr4::tree::TerminalNode *ASSIGN();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
