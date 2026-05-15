@@ -19,6 +19,8 @@ statement
     | saveStat          // !save t1;
     | playStat          // PLAY t1;
     | returnStat        // !out 5;
+    | breakStat         // !break;
+    | continueStat      // !continue;
     | block             // nameless scope
     ;
 
@@ -53,6 +55,10 @@ loopStat
     ;
 
 untilStat : EXCLAM_MARK UNTIL L_ANGLE expr R_ANGLE block ;
+
+breakStat : EXCLAM_MARK BREAK SEMI ;
+
+continueStat : EXCLAM_MARK CONTINUE SEMI ;
 
 funcDef : EXCLAM_MARK DEFINE type ID L_ANGLE (type ID (COMMA type ID)*)? R_ANGLE block ;
 
@@ -124,6 +130,8 @@ DEFINE         : 'define' ;
 OUT            : 'out' ; 
 SHOUT          : 'shout' ;   
 SAVE           : 'save' ;
+BREAK          : 'break' ;
+CONTINUE       : 'continue' ;
 
 // Nowe słowa kluczowe
 NEW            : 'NEW' ;
