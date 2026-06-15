@@ -87,6 +87,28 @@ struct Note {
         // Środkowe C4 to numer 60 (69 - 9).
         return 69 + getOffsetFromA4();
     }
+    bool operator==(const Note& other) const {
+        return this->toMidiNumber() == other.toMidiNumber();
+    }
+
+    bool operator!=(const Note& other) const {
+        return !(*this == other);
+    }
+    bool operator<(const Note& other) const {
+        return this->toMidiNumber() < other.toMidiNumber();
+    }
+
+    bool operator<=(const Note& other) const {
+        return this->toMidiNumber() <= other.toMidiNumber();
+    }
+
+    bool operator>(const Note& other) const {
+        return this->toMidiNumber() > other.toMidiNumber();
+    }
+
+    bool operator>=(const Note& other) const {
+        return this->toMidiNumber() >= other.toMidiNumber();
+    }
 };
 
 
@@ -161,6 +183,29 @@ public:
         return amplifiedSound;
     }
 
+    bool operator==(const Sound& other) const {
+        return this->samples == other.samples;
+    }
+
+    bool operator!=(const Sound& other) const {
+        return !(*this == other);
+    }
+
+    bool operator<(const Sound& other) const {
+        return this->samples.size() < other.samples.size();
+    }
+
+    bool operator<=(const Sound& other) const {
+        return this->samples.size() <= other.samples.size();
+    }
+
+    bool operator>(const Sound& other) const {
+        return this->samples.size() > other.samples.size();
+    }
+
+    bool operator>=(const Sound& other) const {
+        return this->samples.size() >= other.samples.size();
+    }
     Sound() {}
 };
 
