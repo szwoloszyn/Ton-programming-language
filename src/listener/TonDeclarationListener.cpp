@@ -201,4 +201,3 @@ void TonDeclarationListener::exitArrayOpStat(TonParser::ArrayOpStatContext *ctx)
         typeChecker.visit(ctx->expr());
     }
 }
-

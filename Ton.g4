@@ -76,7 +76,6 @@ audioOpStat
     | target VOL expr SEMI
     ;
 
-
 arrayOpStat
     : APPEND expr TO ID SEMI
     | CLEAR ID SEMI
@@ -96,7 +95,7 @@ expr
     | ID L_PAREN (expr (COMMA expr)*)? R_PAREN                 # FunctionCallExpr
     | ID expr expr expr?                                       # CreateSoundExpr
     | expr (AS STRING_VAL)? AT expr                            # TrackEventExpr
-    | expr L_BRACKET expr COLON expr R_BRACKET                 # SliceExpr 
+    | expr L_BRACKET expr COLON expr R_BRACKET                 # SliceExpr   
     | expr L_BRACKET expr R_BRACKET                            # IndexExpr    
     | L_PAREN expr R_PAREN                                     # ParensExpr
     | (NOT_KW) expr                                            # NotExpr
@@ -116,8 +115,8 @@ expr
     | target                                                   # TargetExpr       // Zastępuje samo ID, by wspierać np. t1.skrzypeczki
     | LENGTH target                                            # LengthOfExpr 
     | EMPTYSOUND                                               # EmptySoundExpr   
-    | ISOLATE target                                           # IsolateExpr  
-    | POP ID                                                   # PopExpr                      
+    | ISOLATE target                                           # IsolateExpr
+    | POP ID                                                   # PopExpr                        
     ;
 
 // --- TOKENS ---

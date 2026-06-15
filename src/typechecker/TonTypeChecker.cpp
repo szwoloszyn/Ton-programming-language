@@ -231,8 +231,6 @@ std::any TonTypeChecker::visitSliceExpr(TonParser::SliceExprContext *ctx) {
 
     return baseType; 
 }
-
-
 std::any TonTypeChecker::visitPopExpr(TonParser::PopExprContext *ctx) {
     std::string varName = ctx->ID()->getText();
 
