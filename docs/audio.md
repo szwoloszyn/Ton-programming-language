@@ -4,6 +4,19 @@ Tøn is a Generative Arithmetic Music Language that allows you to script, mix, a
 
 ---
 
+## Table of Contents
+* [1. The `USE` Keyword & Instrument Selection](#1-the-use-keyword--instrument-selection)
+* [2. Basic Music-Oriented Data Types](#2-basic-music-oriented-data-types)
+* [3. Audio Construction & Timelines](#3-audio-construction--timelines)
+  * [Timelines and Tracks](#timelines-and-tracks)
+  * [Placing Sounds on a Track](#placing-sounds-on-a-track-at-)
+  * [Tagging Sounds](#tagging-sounds-as)
+* [4. Audio-Specific Operators](#4-audio-specific-operators)
+* [6. Audio Manipulation Operators](#6-audio-manipulation-operators)
+* [7. Exporting and Playback](#7-exporting-and-playback)
+* [8. Complete Audio Example](#8-complete-audio-example)
+
+---
 
 ## 1. The `USE` Keyword & Instrument Selection
 
